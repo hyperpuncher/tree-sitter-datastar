@@ -23,6 +23,7 @@ show_usage() {
     echo "  templ      - Go templates"
     echo "  heex       - Phoenix/Elixir templates"
     echo "  blade      - Laravel/PHP templates"
+    echo "  jsx,tsx    - JSX/TSX templates"
     echo ""
     echo "Examples:"
     echo "  $0 nvim                    # HTML only"
@@ -127,6 +128,10 @@ if [ "$EDITOR" = "nvim" ] || [ "$EDITOR" = "neovim" ]; then
             blade)
                 TEMPLATE_DIR="$HOME/.config/nvim/after/queries/blade"
                 INJECTION_SRC="injections-nvim.scm"
+                ;;
+            jsx|tsx)
+                TEMPLATE_DIR="$HOME/.config/nvim/after/queries/$template"
+                INJECTION_SRC="injections-nvim-jsx.scm"
                 ;;
             *)
                 echo -e "${YELLOW}⚠${NC}  Unknown template language: $template (skipping)"

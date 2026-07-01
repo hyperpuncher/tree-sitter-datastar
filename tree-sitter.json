@@ -10,6 +10,7 @@
         "html"
       ],
       "injection-regex": "^datastar$",
+      "highlights": "queries/datastar/highlights.scm",
       "class-name": "TreeSitterDatastar"
     }
   ],

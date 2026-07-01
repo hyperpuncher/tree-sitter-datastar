@@ -1,1 +1,1 @@
-require('tree-sitter-datastar').setup()
+vim.schedule(function() require('tree-sitter-datastar').setup() end)

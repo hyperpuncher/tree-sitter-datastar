@@ -1,18 +1,23 @@
 ; Highlighting rules for datastar expressions
 
 ; Datastar attribute names - parsed from HTML attribute names
-; data-{plugin}:{modifier} OR data-{plugin}
-; Capture with modifier
-(datastar_attribute
-  "data-" @tag.attribute
-  (plugin_name) @tag.builtin
-  ":" @punctuation.delimiter
-  (modifier) @property)
-
-; Capture without modifier (data-signals, data-init, etc.)
+; data-{plugin}[:key][__modifier[.tag]...]
 (datastar_attribute
   "data-" @tag.attribute
   (plugin_name) @tag.builtin)
+
+(datastar_attribute
+  ":" @punctuation.delimiter
+  (plugin_key) @property)
+
+(datastar_attribute
+  "__" @punctuation.delimiter
+  (modifier
+    (modifier_name) @property))
+
+(modifier
+  "." @punctuation.delimiter
+  (modifier_tag) @property)
 
 (signal_reference) @variable.builtin.datastar
 

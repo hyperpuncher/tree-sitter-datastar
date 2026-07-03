@@ -5,5 +5,3 @@
 
 (object) @class.around
 (array) @class.around
-
-(comment) @comment.around

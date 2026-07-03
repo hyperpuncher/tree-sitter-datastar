@@ -600,6 +600,35 @@
     }
   },
   {
+    "type": "modifier",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "modifier_name",
+          "named": true
+        },
+        {
+          "type": "modifier_tag",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "modifier_name",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "modifier_tag",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "object",
     "named": true,
     "fields": {},
@@ -1260,12 +1289,28 @@
     "named": false
   },
   {
+    "type": "else",
+    "named": false
+  },
+  {
+    "type": "else-if",
+    "named": false
+  },
+  {
     "type": "false",
+    "named": false
+  },
+  {
+    "type": "for",
     "named": false
   },
   {
     "type": "identifier",
     "named": true
+  },
+  {
+    "type": "if",
+    "named": false
   },
   {
     "type": "ignore",
@@ -1296,8 +1341,8 @@
     "named": false
   },
   {
-    "type": "modifier",
-    "named": true
+    "type": "match-media",
+    "named": false
   },
   {
     "type": "null_literal",

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 project(tree-sitter-datastar
         VERSION "0.1.0"
         DESCRIPTION "Grammar for Datastar @ data-star.dev"
-        HOMEPAGE_URL "https://github.com/tree-sitter/tree-sitter-datastar"
+        HOMEPAGE_URL "https://github.com/hyperpuncher/tree-sitter-datastar"
         LANGUAGES C)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)

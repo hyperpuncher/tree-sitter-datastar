@@ -20,13 +20,17 @@
     "description": "Grammar for Datastar @ data-star.dev",
     "authors": [
       {
+        "name": "hyperpuncher",
+        "url": "https://github.com/hyperpuncher"
+      },
+      {
         "name": "Yury Kleyman",
         "email": "kleymanyy@gmail.com",
         "url": "https://github.com/YuryKL"
       }
     ],
     "links": {
-      "repository": "https://github.com/tree-sitter/tree-sitter-datastar"
+      "repository": "https://github.com/hyperpuncher/tree-sitter-datastar"
     }
   },
   "bindings": {

@@ -30,13 +30,16 @@ local html = [[<div data-on:click="$count++" data-onboarding="wrong"
  data-preserve-attr="open class" data-nonce="abc123"
  data-star-text="$title" data-bind:name__root
  data-on:input__debounce.300ms="$query = evt.target.value"
- data-rocket="old"></div>]]
+ data-rocket="old" data-match-media:dark="prefers-color-scheme: dark"
+ data-star-match-media:wide="'(min-width: 800px)'"></div>]]
 local expected = {
 	['data-on:click'] = 1, ['$count++'] = 1,
 	['data-bind'] = 1, ['data-indicator'] = 1, ['data-ref'] = 1,
 	['data-preserve-attr'] = 1, ['data-nonce'] = 1,
 	['data-star-text'] = 1, ['$title'] = 1, ['data-bind:name__root'] = 1,
 	['data-on:input__debounce.300ms'] = 1, ['$query = evt.target.value'] = 1,
+	['data-match-media:dark'] = 1, ['data-star-match-media:wide'] = 1,
+	["'(min-width: 800px)'"] = 1,
 }
 for _, path in ipairs({ 'after/queries/html/injections.scm', 'docs/helix-html-injections.scm' }) do
 	assert(vim.deep_equal(contents('html', path, html), expected), path)
@@ -44,14 +47,23 @@ end
 
 local jsx = [[const view = <div data-on:click="$count++" data-text={`$title`}
  data-on:input={`$query = evt.target.value`} data-bind="user.name"
- data-onboarding="wrong" attrs={{ 'data-star-show': '$visible',
- 'data-ref': 'input', 'data-textual': 'wrong' }} />;
+ data-onboarding="wrong" data-init={`@get('${url}')`}
+ data-match-media:dark="prefers-color-scheme: dark"
+ data-match-media:wide="'(min-width: 800px)'"
+ data-match-media:print={`'(print)'`}
+ attrs={{ 'data-star-show': '$visible', 'data-ref': 'input',
+ 'data-textual': 'wrong', 'data-match-media:small': '(max-width: 400px)',
+ 'data-match-media:medium': "'(min-width: 600px)'" }} />;
 const unrelated = { 'data-text': 'wrong' };]]
 local jsxExpected = {
 	['data-on:click'] = 1, ['$count++'] = 1,
 	['data-text'] = 1, ['$title'] = 1,
 	['data-on:input'] = 1, ['$query = evt.target.value'] = 1,
 	['data-bind'] = 1, ['data-star-show'] = 1, ['$visible'] = 1, ['data-ref'] = 1,
+	['data-init'] = 1, ['data-match-media:dark'] = 1, ['data-match-media:wide'] = 1,
+	["'(min-width: 800px)'"] = 1, ['data-match-media:print'] = 1, ["'(print)'"] = 1,
+	['data-match-media:small'] = 1, ['data-match-media:medium'] = 1,
+	["'(min-width: 600px)'"] = 1,
 }
 for host, directory in pairs({ javascript = 'jsx', tsx = 'tsx' }) do
 	assert(vim.deep_equal(contents(host, 'after/queries/' .. directory .. '/injections.scm', jsx), jsxExpected), host)

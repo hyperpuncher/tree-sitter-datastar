@@ -14,7 +14,15 @@
   (attribute_name) @_attr
   (quoted_attribute_value
     (attribute_value) @injection.content))
-  (#match? @_attr "^data-(star-)?(attr|class|computed|effect|init|json-signals|on|on-intersect|on-interval|on-signal-patch|on-signal-patch-filter|show|signals|style|text|animate|custom-validity|match-media|on-raf|on-resize|persist|query-string|replace-url|scroll-into-view|view-transition|if|else-if|for)(:|__|$)")
+  (#match? @_attr "^data-(star-)?(attr|class|computed|effect|init|json-signals|on|on-intersect|on-interval|on-signal-patch|on-signal-patch-filter|show|signals|style|text|animate|custom-validity|on-raf|on-resize|persist|query-string|replace-url|scroll-into-view|view-transition|if|else-if|for)(:|__|$)")
+  (#set! injection.language "datastar"))
+
+; Media queries may be raw text. Inject only quoted expression values.
+((attribute
+  (attribute_name) @_attr
+  (quoted_attribute_value (attribute_value) @injection.content))
+  (#match? @_attr "^data-(star-)?(match-media)(:|__|$)")
+  (#match? @injection.content "^[\"'`]")
   (#set! injection.language "datastar"))
 
 ; Attribute names, including keys and modifiers.

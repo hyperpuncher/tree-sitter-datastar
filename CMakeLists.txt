@@ -6,6 +6,8 @@ project(tree-sitter-datastar
         HOMEPAGE_URL "https://github.com/hyperpuncher/tree-sitter-datastar"
         LANGUAGES C)
 
+include(GNUInstallDirs)
+
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 option(TREE_SITTER_REUSE_ALLOCATOR "Reuse the library allocator" OFF)
 
@@ -44,17 +46,15 @@ set_target_properties(tree-sitter-datastar
 configure_file(bindings/c/tree-sitter-datastar.pc.in
                "${CMAKE_CURRENT_BINARY_DIR}/tree-sitter-datastar.pc" @ONLY)
 
-include(GNUInstallDirs)
-
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bindings/c/tree_sitter"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
         FILES_MATCHING PATTERN "*.h")
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/tree-sitter-datastar.pc"
-        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig")
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 install(TARGETS tree-sitter-datastar
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 
-file(GLOB QUERIES queries/*.scm)
+file(GLOB QUERIES CONFIGURE_DEPENDS queries/datastar/*.scm)
 install(FILES ${QUERIES}
         DESTINATION "${CMAKE_INSTALL_DATADIR}/tree-sitter/queries/datastar")
 

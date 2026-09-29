@@ -3,8 +3,9 @@ $(error Windows is not supported)
 endif
 
 LANGUAGE_NAME := tree-sitter-datastar
-HOMEPAGE_URL := https://github.com/tree-sitter/tree-sitter-datastar
+HOMEPAGE_URL := https://github.com/hyperpuncher/tree-sitter-datastar
 VERSION := 0.1.0
+DESCRIPTION := Grammar for Datastar @ data-star.dev
 
 # repository
 SRC_DIR := src
@@ -77,7 +78,7 @@ install: all
 	install -m755 lib$(LANGUAGE_NAME).$(SOEXT) '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).$(SOEXTVER)
 	ln -sf lib$(LANGUAGE_NAME).$(SOEXTVER) '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).$(SOEXTVER_MAJOR)
 	ln -sf lib$(LANGUAGE_NAME).$(SOEXTVER_MAJOR) '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).$(SOEXT)
-	install -m644 queries/*.scm '$(DESTDIR)$(DATADIR)'/tree-sitter/queries/datastar
+	install -m644 queries/datastar/*.scm '$(DESTDIR)$(DATADIR)'/tree-sitter/queries/datastar
 
 uninstall:
 	$(RM) '$(DESTDIR)$(LIBDIR)'/lib$(LANGUAGE_NAME).a \

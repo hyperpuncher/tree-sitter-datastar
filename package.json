@@ -43,14 +43,17 @@
     "binding.gyp",
     "prebuilds/**",
     "bindings/node/*",
-    "queries/*",
-    "src/**",
+    "queries/**/*.scm",
+    "after/queries/**/*.scm",
+    "docs/helix-html-injections.scm",
+    "src/*.c",
+    "src/*.json",
+    "src/tree_sitter/*.h",
     "*.wasm"
   ],
   "dependencies": {
     "node-addon-api": "^8.9.0",
-    "node-gyp-build": "^4.8.4",
-    "tree-sitter-javascript": "^0.25.0"
+    "node-gyp-build": "^4.8.4"
   },
   "devDependencies": {
     "prebuildify": "^6.0.1",
@@ -69,7 +72,10 @@
     "install": "node-gyp-build",
     "prestart": "tree-sitter build --wasm",
     "start": "tree-sitter playground",
-    "test": "node --test bindings/node/*_test.js",
+    "test": "tree-sitter test && node --test bindings/node/*_test.js test/generation.test.js",
+    "generate": "tree-sitter generate && node scripts/generate-queries.js",
+    "test:injections": "nvim --headless -u NONE -l test/injections.lua",
+    "test:distribution": "node --test test/distribution.test.js",
     "prebuildify": "prebuildify --napi --strip"
   },
   "tree-sitter": [

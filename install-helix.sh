@@ -36,7 +36,7 @@ read -r -a FLAGS <<< "${CFLAGS:--O2}"
 mkdir -p "$RUNTIME_DIR/grammars" "$RUNTIME_DIR/queries/datastar"
 echo "Compiling parser..."
 "${COMPILER[@]}" "${FLAGS[@]}" -shared -fPIC -I"$SCRIPT_DIR/src" \
-	"$SCRIPT_DIR/src/parser.c" -o "$RUNTIME_DIR/grammars/datastar.so"
+	"$SCRIPT_DIR/src/parser.c" "$SCRIPT_DIR/src/scanner.c" -o "$RUNTIME_DIR/grammars/datastar.so"
 cp "$SCRIPT_DIR/queries/highlights-helix.scm" "$RUNTIME_DIR/queries/datastar/highlights.scm"
 
 if $INSTALL_HTML; then

@@ -10,6 +10,7 @@ from wheel.bdist_wheel import bdist_wheel
 sources = [
     "bindings/python/tree_sitter_datastar/binding.c",
     "src/parser.c",
+    "src/scanner.c",
 ]
 
 macros: list[tuple[str, str | None]] = [

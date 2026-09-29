@@ -62,7 +62,7 @@ test("packages contain queries, not build artifacts or the local review", (t) =>
   }
   assert(!files.includes("review.md"));
   assert(!files.includes("parser.o"));
-  assert(!files.includes("scanner.c"));
+  assert(files.includes("src/scanner.c"));
   const cargo = run("cargo", ["package", "--list", "--allow-dirty"]);
   assert(cargo.includes("queries/datastar/highlights.scm"));
   assert(!cargo.includes("node_modules/"));

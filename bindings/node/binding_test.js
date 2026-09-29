@@ -2,6 +2,8 @@ const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const Parser = require("tree-sitter");
 const language = require(".");
+const { readFileSync } = require("node:fs");
+const { resolve } = require("node:path");
 
 const createParser = () => {
   const parser = new Parser();
@@ -20,15 +22,31 @@ test("native binding parses current Datastar syntax", () => {
     "@query('/endpoint', {payload: {foo: $foo}},)",
     "letter, row in $$letters.filter(Boolean)",
     "data-star-bind:_foo_bar__root__prop.value__event.input.change",
+    "$controller = new AbortController(); @get('/endpoint')",
+    "@peek(() => { const value = $foo; return value + 1 })",
+    "`count: ${$$count}`", "$controller?.abort?.()", "{foo: $foo, value}",
   ]) {
     assert(!parser.parse(source).rootNode.hasError, source);
   }
-  for (const source of ["data-on:__window", "data-on: click", "$count++ @get('/save')"]) {
+  for (const source of ["data-on:__window", "data-on: click", "$count++ @get('/save')", "$count++\n@get('/save')"]) {
     assert(parser.parse(source).rootNode.hasError, source);
   }
-  const sequence = parser.parse("$count++; ".repeat(200)).rootNode.namedChild(0);
-  assert.equal(sequence.type, "sequence_expression");
-  assert.equal(sequence.namedChildCount, 200);
+  const program = parser.parse("$count++; ".repeat(200)).rootNode;
+  assert.equal(program.type, "program");
+  assert.equal(program.namedChildCount, 200);
+});
+
+test("signals and actions inside template interpolation are highlighted", () => {
+  const query = new Parser.Query(language, readFileSync(resolve(__dirname, "../../queries/datastar/highlights.scm"), "utf8"));
+  const source = "`value: ${$count + @peek(() => $$local)}`; '$notASignal'";
+  const captures = query.captures(createParser().parse(source).rootNode)
+    .filter(({ name }) => name.endsWith(".datastar"))
+    .map(({ name, node }) => [name, node.text]);
+  assert.deepEqual(captures, [
+    ["variable.builtin.datastar", "$count"],
+    ["function.builtin.datastar", "@peek"],
+    ["variable.builtin.datastar", "$$local"],
+  ]);
 });
 
 test("incremental key and modifier edits match a fresh parse", () => {

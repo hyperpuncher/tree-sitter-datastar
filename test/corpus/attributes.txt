@@ -4,7 +4,7 @@ chained modifiers
 data-on:click__window__debounce.500ms.leading
 ---
 
-(source_file
+(program
   (datastar_attribute
     (plugin_name)
     (plugin_key)
@@ -21,7 +21,7 @@ dotted signal key
 data-signals:foo_bar.baz__case.snake
 ---
 
-(source_file
+(program
   (datastar_attribute
     (plugin_name)
     (plugin_key)
@@ -35,7 +35,7 @@ pro match media
 data-match-media:is-dark__case.kebab
 ---
 
-(source_file
+(program
   (datastar_attribute
     (plugin_name)
     (plugin_key)
@@ -52,7 +52,7 @@ data-else
 data-for
 ---
 
-(source_file
+(program
   (datastar_attribute
     (plugin_name))
   (datastar_attribute

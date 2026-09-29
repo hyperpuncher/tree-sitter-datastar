@@ -1,5 +1,5 @@
 /**
- * @file Grammar for Datastar @ data-star.dev
+ * @file Datastar attributes and expressions, extending the JavaScript grammar.
  * @author Yury Kleyman <kleymanyy@gmail.com>
  * @license MIT
  */
@@ -7,327 +7,79 @@
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
-module.exports = grammar({
-	name: "datastar",
+const javascript = require("tree-sitter-javascript/grammar");
 
-	conflicts: ($) => [
-		[$._statement, $.sequence_expression],
-		[$.sequence_expression],
-		[$.primary_expression, $.loop_expression],
-	],
+module.exports = grammar(javascript, {
+  name: "datastar",
 
-	rules: {
-		source_file: ($) =>
-			choice(
-				repeat1($.datastar_attribute),
-				seq(optional($._statement), optional(";")),
-				$.loop_expression,
-			),
+  conflicts: ($, original) => [
+    ...original,
+    [$.primary_expression, $.loop_expression],
+    [$.decorator_call_expression, $.action_name],
+  ],
 
-		datastar_attribute: ($) =>
-			seq(
-				choice("data-", "data-star-"),
-				$.plugin_name,
-				optional(seq(":", $.plugin_key)),
-				repeat(seq("__", $.modifier)),
-			),
+  precedences: ($, original) => [...original, ["signal", "member"]],
 
-		plugin_name: ($) =>
-			choice(
-				// Standard plugins
-				"attr",
-				"bind",
-				"class",
-				"computed",
-				"effect",
-				"ignore",
-				"ignore-morph",
-				"indicator",
-				"init",
-				"json-signals",
-				"nonce",
-				"on",
-				"on-intersect",
-				"on-interval",
-				"on-signal-patch",
-				"on-signal-patch-filter",
-				"preserve-attr",
-				"ref",
-				"show",
-				"signals",
-				"style",
-				"text",
-				// Pro plugins
-				"animate",
-				"custom-validity",
-				"match-media",
-				"on-raf",
-				"on-resize",
-				"persist",
-				"query-string",
-				"replace-url",
-				"scroll-into-view",
-				"view-transition",
-				// Rocket structural template plugins
-				"if",
-				"else-if",
-				"else",
-				"for",
-			),
+  rules: {
+    program: ($) => choice(repeat1($.datastar_attribute), repeat($.statement), $.loop_expression),
 
-		// Keep underscores separate so the longer __ delimiter wins lexically.
-		plugin_key: ($) =>
-			choice(
-				token.immediate("_"),
-				seq(
-					token.immediate(/_?[a-zA-Z0-9.-]+/),
-					repeat(seq(token.immediate("_"), token.immediate(/[a-zA-Z0-9.-]+/))),
-					optional(token.immediate("_")),
-				),
-			),
+    // Attribute values such as {foo: $bar} are expressions, not labeled blocks.
+    expression_statement: ($, original) => prec.dynamic(1, original),
 
-		modifier: ($) => seq($.modifier_name, repeat(seq(".", $.modifier_tag))),
+    primary_expression: ($, original) => choice(original, $.signal_reference, $.action_call),
+    _lhs_expression: ($, original) => choice(original, $.signal_reference),
+    _augmented_assignment_lhs: ($, original) => choice(original, $.signal_reference),
 
-		modifier_name: ($) => /[a-zA-Z0-9-]+/,
-		modifier_tag: ($) => /[a-zA-Z0-9-]+/,
+    datastar_attribute: ($) => seq(
+      choice("data-", "data-star-"),
+      $.plugin_name,
+      optional(seq(":", $.plugin_key)),
+      repeat(seq("__", $.modifier)),
+    ),
 
-		_statement: ($) => choice($._simple_statement, $.sequence_expression),
+    plugin_name: () => choice(
+      // Core attributes and CSP configuration.
+      "attr", "bind", "class", "computed", "effect", "ignore", "ignore-morph",
+      "indicator", "init", "json-signals", "nonce", "on", "on-intersect",
+      "on-interval", "on-signal-patch", "on-signal-patch-filter", "preserve-attr",
+      "ref", "show", "signals", "style", "text",
+      // Pro attributes.
+      "animate", "custom-validity", "match-media", "on-raf", "on-resize",
+      "persist", "query-string", "replace-url", "scroll-into-view", "view-transition",
+      // Rocket structural templates.
+      "if", "else-if", "else", "for",
+    ),
 
-		_simple_statement: ($) => choice($.expression_statement, $.assignment_statement),
+    // Keep underscores separate so the longer __ delimiter wins lexically.
+    plugin_key: () => choice(
+      token.immediate("_"),
+      seq(
+        token.immediate(/_?[a-zA-Z0-9.-]+/),
+        repeat(seq(token.immediate("_"), token.immediate(/[a-zA-Z0-9.-]+/))),
+        optional(token.immediate("_")),
+      ),
+    ),
 
-		expression_statement: ($) => $._expression,
+    modifier: ($) => seq($.modifier_name, repeat(seq(".", $.modifier_tag))),
+    modifier_name: () => /[a-zA-Z0-9-]+/,
+    modifier_tag: () => /[a-zA-Z0-9-]+/,
 
-		assignment_statement: ($) =>
-			seq(
-				$._lhs_expression,
-				choice(
-					"=",
-					"+=",
-					"-=",
-					"*=",
-					"/=",
-					"%=",
-					"**=",
-					"&&=",
-					"||=",
-					"??=",
-					"&=",
-					"|=",
-					"^=",
-					"<<=",
-					">>=",
-					">>>=",
-				),
-				$._expression,
-			),
+    // Prefer Datastar prefixes over JavaScript identifiers beginning with $.
+    signal_reference: ($) => prec.right("signal", seq(
+      choice(token(prec(1, "$")), token(prec(1, "$$"))),
+      optional($._property_chain),
+    )),
+    signal_identifier: () => token.immediate(prec(2, /[a-zA-Z0-9_]+(-[a-zA-Z0-9_]+)*/)),
+    _property_chain: ($) => prec.right("signal", seq(
+      $.signal_identifier,
+      repeat(choice(
+        seq(".", $.signal_identifier),
+        seq("[", $._expressions, "]"),
+      )),
+    )),
 
-		// Comma/semicolon operator for sequences (e.g., "a = 1, b = 2" or "a = 1; b = 2")
-		sequence_expression: ($) =>
-			seq($._simple_statement, repeat1(seq(choice(",", ";"), $._simple_statement))),
-
-		_lhs_expression: ($) =>
-			choice($.signal_reference, $.member_expression, $.computed_member_expression),
-
-		_expression: ($) =>
-			choice(
-				$.primary_expression,
-				$.binary_expression,
-				$.unary_expression,
-				$.conditional_expression,
-				$.call_expression,
-				$.member_expression,
-				$.computed_member_expression,
-				$.parenthesized_expression,
-				$.arrow_function,
-			),
-
-		primary_expression: ($) =>
-			choice(
-				$.identifier,
-				$.signal_reference,
-				$.action_call,
-				$.literal,
-				$.array,
-				$.object,
-			),
-
-		// Datastar-specific
-		signal_reference: ($) =>
-			prec.right(18, seq(choice("$", "$$"), optional($._property_chain))),
-		loop_expression: ($) =>
-			prec.dynamic(1, seq($.identifier, ",", $.identifier, "in", $._expression)),
-		action_call: ($) => seq($.action_name, "(", optional($.arguments), ")"),
-		action_name: ($) => seq("@", $.identifier),
-
-		_property_chain: ($) =>
-			prec.right(
-				18,
-				seq(
-					$.signal_identifier,
-					repeat(
-						choice(
-							seq(".", $.signal_identifier),
-							seq("[", $._expression, "]"),
-							seq("?.", $.signal_identifier),
-							seq("?.[", $._expression, "]"),
-						),
-					),
-				),
-			),
-
-		// Binary operators
-		binary_expression: ($) =>
-			choice(
-				...[
-					["??", 3],
-					["||", 4],
-					["&&", 5],
-					["|", 6],
-					["^", 7],
-					["&", 8],
-					["==", 9],
-					["!=", 9],
-					["===", 9],
-					["!==", 9],
-					["<", 10],
-					["<=", 10],
-					[">", 10],
-					[">=", 10],
-					["in", 10],
-					["instanceof", 10],
-					["<<", 11],
-					[">>", 11],
-					[">>>", 11],
-					["+", 12],
-					["-", 12],
-					["*", 13],
-					["/", 13],
-					["%", 13],
-					["**", 14],
-				].map(([operator, precedence]) =>
-					prec.left(precedence, seq($._expression, operator, $._expression)),
-				),
-			),
-
-		unary_expression: ($) =>
-			choice(
-				prec.left(
-					15,
-					seq(
-						choice("!", "~", "-", "+", "typeof", "void", "delete"),
-						$._expression,
-					),
-				),
-				prec.left(16, seq($._expression, choice("++", "--"))),
-			),
-
-		conditional_expression: ($) =>
-			prec.right(2, seq($._expression, "?", $._expression, ":", $._expression)),
-
-		call_expression: ($) =>
-			prec.left(17, seq($._expression, "(", optional($.arguments), ")")),
-
-		member_expression: ($) =>
-			prec.left(17, seq($._expression, choice(".", "?."), $.identifier)),
-
-		computed_member_expression: ($) =>
-			prec.left(17, seq($._expression, choice("[", "?.["), $._expression, "]")),
-
-		parenthesized_expression: ($) => seq("(", $._expression, ")"),
-
-		// Literals
-		literal: ($) =>
-			choice(
-				$.string_literal,
-				$.regex_literal,
-				$.number_literal,
-				$.boolean_literal,
-				$.null_literal,
-				$.undefined_literal,
-			),
-
-		regex_literal: ($) => seq("/", /[^/\\]*(\\.[^/\\]*)*/, "/", /[gimsuy]*/),
-
-		string_literal: ($) =>
-			choice(
-				seq('"', repeat(choice(/[^"\\]/, $.escape_sequence)), '"'),
-				seq("'", repeat(choice(/[^'\\]/, $.escape_sequence)), "'"),
-				seq("`", repeat(choice(/[^`\\]/, $.escape_sequence)), "`"),
-			),
-
-		escape_sequence: ($) =>
-			seq(
-				"\\",
-				choice(/[\\'"nrtbf]/, /u[0-9a-fA-F]{4}/, /x[0-9a-fA-F]{2}/, /[0-7]{1,3}/),
-			),
-
-		number_literal: ($) => /\d+(\.\d+)?([eE][+-]?\d+)?/,
-		boolean_literal: ($) => choice("true", "false"),
-		null_literal: ($) => "null",
-		undefined_literal: ($) => "undefined",
-
-		// Collections
-		array: ($) =>
-			seq(
-				"[",
-				optional(
-					seq(
-						choice($._expression, $.spread_element),
-						repeat(seq(",", choice($._expression, $.spread_element))),
-						optional(","),
-					),
-				),
-				"]",
-			),
-
-		object: ($) =>
-			seq(
-				"{",
-				optional(
-					seq(
-						choice($.property, $.spread_element),
-						repeat(seq(",", choice($.property, $.spread_element))),
-						optional(","),
-					),
-				),
-				"}",
-			),
-
-		property: ($) =>
-			seq(
-				choice($.identifier, $.string_literal, seq("[", $._expression, "]")),
-				":",
-				$._expression,
-			),
-
-		// Spread operator (...expr)
-		spread_element: ($) => seq("...", $._expression),
-
-		// Arrow functions
-		arrow_function: ($) =>
-			prec.right(
-				1,
-				seq(
-					choice($.identifier, seq("(", optional($.parameter_list), ")")),
-					"=>",
-					$._expression,
-				),
-			),
-
-		parameter_list: ($) => prec(1, seq($.identifier, repeat(seq(",", $.identifier)))),
-
-		arguments: ($) =>
-			seq(
-				choice($._expression, $.spread_element),
-				repeat(seq(",", choice($._expression, $.spread_element))),
-				optional(","),
-			),
-
-		// Standard JavaScript identifier (used for variables, properties, etc.)
-		identifier: ($) => /[a-zA-Z_][a-zA-Z0-9_$]*/,
-
-		// Datastar-specific identifier that allows hyphens (for signal names like $foo-bar)
-		// This is used only in signal_reference contexts
-		signal_identifier: ($) => token(prec(1, /[a-zA-Z0-9_]+(-[a-zA-Z0-9_]+)*/)),
-	},
+    action_call: ($) => seq($.action_name, $.arguments),
+    action_name: ($) => seq("@", $.identifier),
+    loop_expression: ($) => prec.dynamic(2, seq($.identifier, ",", $.identifier, "in", $.expression)),
+  },
 });

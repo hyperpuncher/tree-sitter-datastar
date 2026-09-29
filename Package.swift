@@ -15,7 +15,7 @@ let package = Package(
             name: "TreeSitterDatastar",
             dependencies: [],
             path: ".",
-            sources: ["src/parser.c"],
+            sources: ["src/parser.c", "src/scanner.c"],
             resources: [
                 .copy("queries")
             ],

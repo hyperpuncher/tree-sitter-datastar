@@ -63,6 +63,7 @@ mod tests {
         }
         for source in [
             "$count++ @post('/save')",
+            "$count++\n@post('/save')",
             "$foo = ;",
             "letter,, row in $$letters",
         ] {
@@ -80,9 +81,8 @@ mod tests {
         let source = "$count++; ".repeat(200);
         let tree = parser.parse(&source, None).unwrap();
         assert!(!tree.root_node().has_error());
-        let sequence = tree.root_node().named_child(0).unwrap();
-        assert_eq!(sequence.kind(), "sequence_expression");
-        assert_eq!(sequence.named_child_count(), 200);
+        assert_eq!(tree.root_node().kind(), "program");
+        assert_eq!(tree.root_node().named_child_count(), 200);
     }
 
     #[test]

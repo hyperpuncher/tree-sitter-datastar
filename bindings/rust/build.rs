@@ -11,5 +11,8 @@ fn main() {
     c_config.file(&parser_path);
     println!("cargo:rerun-if-changed={}", parser_path.to_str().unwrap());
 
+    c_config.file(src_dir.join("scanner.c"));
+    println!("cargo:rerun-if-changed=src/scanner.c");
+
     c_config.compile("tree-sitter-datastar");
 }

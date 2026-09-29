@@ -1,7 +1,18 @@
 ; Textobjects for datastar
 
-(arrow_function) @function.around
-(call_expression) @function.around
+[
+  (arrow_function)
+  (function_expression)
+  (function_declaration)
+  (generator_function)
+  (generator_function_declaration)
+  (method_definition)
+  (call_expression)
+] @function.around
 
-(object) @class.around
-(array) @class.around
+[
+  (object)
+  (array)
+  (class)
+  (class_declaration)
+] @class.around

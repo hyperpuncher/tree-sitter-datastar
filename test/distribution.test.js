@@ -28,7 +28,29 @@ const verifyInstall = (prefix) => {
   assert.match(metadata, /URL: https:\/\/github.com\/hyperpuncher\/tree-sitter-datastar/);
   assert.match(metadata, /Description: Grammar for Datastar/);
   assert(!metadata.includes("@CMAKE_"));
+  for (const [compiler, language] of [["cc", "c"], ["c++", "c++"]]) {
+    const consumer = join(prefix, `consumer-${language}`);
+    run(compiler, ["-x", language, "-", `-I${prefix}/include`, `-L${prefix}/lib`,
+      "-ltree-sitter-datastar", `-Wl,-rpath,${prefix}/lib`, "-o", consumer], {
+      input: "#include <tree_sitter/tree-sitter-datastar.h>\nint main(void) { return tree_sitter_datastar() ? 0 : 1; }\n",
+    });
+    run(consumer, []);
+  }
 };
+
+test("public C and Swift headers compile through their existing include paths", () => {
+  for (const [header, include] of [
+    ["tree-sitter-datastar.h", "bindings/c"],
+    ["tree_sitter/tree-sitter-datastar.h", "bindings/c"],
+    ["TreeSitterDatastar/datastar.h", "bindings/swift"],
+  ]) {
+    for (const [compiler, language] of [["cc", "c"], ["c++", "c++"]]) {
+      run(compiler, ["-x", language, "-", "-fsyntax-only", `-I${join(root, include)}`], {
+        input: `#include <${header}>\nconst TSLanguage *(*language)(void) = tree_sitter_datastar;\n`,
+      });
+    }
+  }
+});
 
 test("CMake installs canonical queries and pkg-config metadata", (t) => {
   const temporaryDirectory = temporary(t);

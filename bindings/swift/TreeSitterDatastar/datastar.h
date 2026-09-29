@@ -1,3 +1,4 @@
+/* Generated from bindings/c/tree_sitter/tree-sitter-datastar.h. Do not edit. */
 #ifndef TREE_SITTER_DATASTAR_H_
 #define TREE_SITTER_DATASTAR_H_
 

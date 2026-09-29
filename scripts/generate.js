@@ -1,4 +1,4 @@
-// Regenerate the scanner, parser, and editor queries in dependency order.
+// Regenerate bindings, scanner, parser, and editor queries in dependency order.
 const { execFileSync } = require("node:child_process");
 const { readFileSync, writeFileSync } = require("node:fs");
 const { dirname, resolve } = require("node:path");
@@ -15,6 +15,11 @@ const output = (path, content) => {
     writeFileSync(destination, content);
   }
 };
+
+// Keep Swift's public header self-contained while sharing the C API definition.
+output("bindings/swift/TreeSitterDatastar/datastar.h",
+  "/* Generated from bindings/c/tree_sitter/tree-sitter-datastar.h. Do not edit. */\n"
+    + readFileSync(resolve(root, "bindings/c/tree_sitter/tree-sitter-datastar.h"), "utf8"));
 
 const scanner = readUpstream("src/scanner.c")
   .replaceAll("tree_sitter_javascript", "tree_sitter_datastar")

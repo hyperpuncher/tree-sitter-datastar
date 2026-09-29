@@ -216,4 +216,5 @@
 ; These override generic JavaScript identifier highlighting.
 (signal_reference) @variable.builtin
 (action_name) @function.builtin
-["?" ":" "..."] @operator
+(ternary_expression ["?" ":"] @operator)
+"..." @operator

@@ -11,6 +11,9 @@ const createParser = () => {
   return parser;
 };
 
+const createHighlightQuery = () => new Parser.Query(language,
+  readFileSync(resolve(__dirname, "../../queries/datastar/highlights.scm"), "utf8"));
+
 test("can load grammar", () => {
   assert.doesNotThrow(createParser);
 });
@@ -37,7 +40,7 @@ test("native binding parses current Datastar syntax", () => {
 });
 
 test("signals and actions inside template interpolation are highlighted", () => {
-  const query = new Parser.Query(language, readFileSync(resolve(__dirname, "../../queries/datastar/highlights.scm"), "utf8"));
+  const query = createHighlightQuery();
   const source = "`value: ${$count + @peek(() => $$local)}`; '$notASignal'";
   const captures = query.captures(createParser().parse(source).rootNode)
     .filter(({ name }) => name.endsWith(".datastar"))
@@ -47,6 +50,20 @@ test("signals and actions inside template interpolation are highlighted", () => 
     ["function.builtin.datastar", "@peek"],
     ["variable.builtin.datastar", "$$local"],
   ]);
+});
+
+test("attribute delimiters are distinct from ternary operators", () => {
+  const query = createHighlightQuery();
+  for (const [source, token, expected] of [
+    ["data-on:click", ":", ["punctuation.delimiter"]],
+    ["$ready ? $a : $b", ":", ["operator"]],
+    ["$ready ? $a : $b", "?", ["operator"]],
+  ]) {
+    const captures = query.captures(createParser().parse(source).rootNode)
+      .filter(({ node }) => node.text === token)
+      .map(({ name }) => name);
+    assert.deepEqual(captures, expected, source);
+  }
 });
 
 test("incremental template edits match a fresh parse", () => {

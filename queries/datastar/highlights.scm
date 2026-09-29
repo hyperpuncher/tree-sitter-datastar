@@ -216,4 +216,5 @@
 ; These override generic JavaScript identifier highlighting.
 (signal_reference) @variable.builtin.datastar
 (action_name) @function.builtin.datastar
-["?" ":" "..."] @operator
+(ternary_expression ["?" ":"] @operator)
+"..." @operator

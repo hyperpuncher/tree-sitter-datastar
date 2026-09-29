@@ -1,6 +1,6 @@
 # tree-sitter-datastar
 
-Tree-sitter grammar for [Datastar](https://data-star.dev) expressions and attributes.
+Tree-sitter grammar for [Datastar](https://data-star.dev) v1.0.4 expressions and attributes, including Pro attributes and Rocket template syntax.
 
 ## Installation
 
@@ -35,14 +35,16 @@ source = { path = "/path/to/tree-sitter-datastar" }
 
 - Parses Datastar attribute names: `data-on:click__debounce.500ms` → plugin, key, modifiers
 - Parses Datastar expressions: `$count++`, `@get('/api')`, `{ foo: $bar }`
-- Signal references: `$user.name`, `$items[0]`, `$data?.user?.email`
+- Signal references: `$user.name`, `$items[0]`, `$data?.user?.email`, `$123`, `$['foo-bar']`
+- Rocket local signals (`$$count`), structural attributes, and `data-for` aliases
+- Official `data-star-*` aliases and the CSP `data-nonce` attribute
 - Action calls: `@post('/data', { id: $userId })`
 - JS-compatible expressions: ternary, arrow functions, objects, arrays, regex literals
 - Injection-based: works inside HTML, Templ, JSX, TSX files (no standalone filetype)
 
 ## Supported Plugins
 
-`attr`, `bind`, `class`, `computed`, `effect`, `ignore`, `ignore-morph`, `indicator`, `init`, `json-signals`, `on`, `on-intersect`, `on-interval`, `on-signal-patch`, `on-signal-patch-filter`, `preserve-attr`, `ref`, `show`, `signals`, `style`, `text`, `animate`, `custom-validity`, `match-media`, `on-raf`, `on-resize`, `persist`, `query-string`, `replace-url`, `rocket`, `scroll-into-view`, `view-transition`, `if`, `else-if`, `else`, `for`
+`attr`, `bind`, `class`, `computed`, `effect`, `ignore`, `ignore-morph`, `indicator`, `init`, `json-signals`, `nonce`, `on`, `on-intersect`, `on-interval`, `on-signal-patch`, `on-signal-patch-filter`, `preserve-attr`, `ref`, `show`, `signals`, `style`, `text`, `animate`, `custom-validity`, `match-media`, `on-raf`, `on-resize`, `persist`, `query-string`, `replace-url`, `scroll-into-view`, `view-transition`, `if`, `else-if`, `else`, `for`
 
 ## Highlight Groups
 
@@ -61,9 +63,19 @@ source = { path = "/path/to/tree-sitter-datastar" }
 ```bash
 git clone https://github.com/hyperpuncher/tree-sitter-datastar
 cd tree-sitter-datastar
-tree-sitter generate   # regenerate parser.c from grammar.js
-tree-sitter test       # run tests
+bunx tree-sitter generate        # regenerate parser from grammar.js
+bun scripts/generate-queries.js  # regenerate host injections from the grammar
+bunx tree-sitter test            # parser corpus
+cargo test                      # Rust binding, queries, and separator checks
+bun run test                    # Node binding
+nvim --headless -u NONE -l test/injections.lua  # requires host parsers
 ```
+
+Host injection queries distinguish expressions from plain signal names and attribute lists. Helix users must also install `docs/helix-html-injections.scm` as their HTML host query; `install-helix.sh` installs only the Datastar parser and its own queries.
+
+## Limitations
+
+This is a partial JavaScript grammar, not a full JavaScript parser. Statements such as `new`, declarations, block-bodied functions, and comments are not supported. Template literals currently parse as strings without highlighting expressions inside `${...}`. Arbitrary custom attribute aliases are not supported.
 
 ## Project Structure
 

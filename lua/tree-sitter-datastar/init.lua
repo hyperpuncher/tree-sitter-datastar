@@ -12,8 +12,6 @@ local function register()
 			requires_generate_from_grammar = false,
 		},
 	}
-
-	vim.treesitter.language.register('datastar', { 'html', 'templ', 'jsx', 'tsx' })
 end
 
 function M.setup()

@@ -880,10 +880,6 @@
         {
           "type": "expression_statement",
           "named": true
-        },
-        {
-          "type": "sequence_expression",
-          "named": true
         }
       ]
     }

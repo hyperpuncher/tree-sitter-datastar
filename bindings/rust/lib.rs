@@ -74,6 +74,18 @@ mod tests {
     }
 
     #[test]
+    fn statement_sequences_are_flat() {
+        let mut parser = tree_sitter::Parser::new();
+        parser.set_language(&super::LANGUAGE.into()).unwrap();
+        let source = "$count++; ".repeat(200);
+        let tree = parser.parse(&source, None).unwrap();
+        assert!(!tree.root_node().has_error());
+        let sequence = tree.root_node().named_child(0).unwrap();
+        assert_eq!(sequence.kind(), "sequence_expression");
+        assert_eq!(sequence.named_child_count(), 200);
+    }
+
+    #[test]
     fn attribute_keys_stop_at_modifier_delimiters() {
         let mut parser = tree_sitter::Parser::new();
         parser.set_language(&super::LANGUAGE.into()).unwrap();

@@ -354,15 +354,24 @@
       "members": [
         {
           "type": "SYMBOL",
+          "name": "_simple_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "sequence_expression"
+        }
+      ]
+    },
+    "_simple_statement": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
           "name": "expression_statement"
         },
         {
           "type": "SYMBOL",
           "name": "assignment_statement"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "sequence_expression"
         }
       ]
     },
@@ -453,42 +462,38 @@
       ]
     },
     "sequence_expression": {
-      "type": "PREC_LEFT",
-      "value": 0,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_statement"
-          },
-          {
-            "type": "REPEAT1",
-            "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "STRING",
-                      "value": ","
-                    },
-                    {
-                      "type": "STRING",
-                      "value": ";"
-                    }
-                  ]
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_statement"
-                }
-              ]
-            }
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_simple_statement"
+        },
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": ","
+                  },
+                  {
+                    "type": "STRING",
+                    "value": ";"
+                  }
+                ]
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_simple_statement"
+              }
+            ]
           }
-        ]
-      }
+        }
+      ]
     },
     "_lhs_expression": {
       "type": "CHOICE",
@@ -2076,6 +2081,10 @@
     }
   ],
   "conflicts": [
+    [
+      "_statement",
+      "sequence_expression"
+    ],
     [
       "sequence_expression"
     ],

@@ -11,6 +11,7 @@ module.exports = grammar({
 	name: "datastar",
 
 	conflicts: ($) => [
+		[$._statement, $.sequence_expression],
 		[$.sequence_expression],
 		[$.primary_expression, $.loop_expression],
 	],
@@ -90,8 +91,9 @@ module.exports = grammar({
 		modifier_name: ($) => /[a-zA-Z0-9-]+/,
 		modifier_tag: ($) => /[a-zA-Z0-9-]+/,
 
-		_statement: ($) =>
-			choice($.expression_statement, $.assignment_statement, $.sequence_expression),
+		_statement: ($) => choice($._simple_statement, $.sequence_expression),
+
+		_simple_statement: ($) => choice($.expression_statement, $.assignment_statement),
 
 		expression_statement: ($) => $._expression,
 
@@ -121,7 +123,7 @@ module.exports = grammar({
 
 		// Comma/semicolon operator for sequences (e.g., "a = 1, b = 2" or "a = 1; b = 2")
 		sequence_expression: ($) =>
-			prec.left(0, seq($._statement, repeat1(seq(choice(",", ";"), $._statement)))),
+			seq($._simple_statement, repeat1(seq(choice(",", ";"), $._simple_statement))),
 
 		_lhs_expression: ($) =>
 			choice($.signal_reference, $.member_expression, $.computed_member_expression),

@@ -26,7 +26,9 @@ Homepage = "https://github.com/hyperpuncher/tree-sitter-datastar"
 Repository = "https://github.com/hyperpuncher/tree-sitter-datastar"
 
 [project.optional-dependencies]
-core = ["tree-sitter~=0.24"]
+core = [
+    "tree-sitter>=0.26,<0.27",
+]
 
 [tool.cibuildwheel]
 build = "cp310-*"

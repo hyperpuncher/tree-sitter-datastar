@@ -16,6 +16,8 @@ package-lock.json
 _obj/
 
 # Python artifacts
+__pycache__/
+*.py[cod]
 .venv/
 dist/
 *.egg-info

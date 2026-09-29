@@ -49,6 +49,28 @@ test("signals and actions inside template interpolation are highlighted", () => 
   ]);
 });
 
+test("incremental template edits match a fresh parse", () => {
+  const parser = createParser();
+  const prefix = "`value: ${";
+  const suffix = "}`";
+  let expression = "$count";
+  let tree = parser.parse(prefix + expression + suffix);
+  for (const replacement of ["@peek(() => $$count)", "($count + ", "$count"]) {
+    tree.edit({
+      startIndex: prefix.length,
+      oldEndIndex: prefix.length + expression.length,
+      newEndIndex: prefix.length + replacement.length,
+      startPosition: { row: 0, column: prefix.length },
+      oldEndPosition: { row: 0, column: prefix.length + expression.length },
+      newEndPosition: { row: 0, column: prefix.length + replacement.length },
+    });
+    const source = prefix + replacement + suffix;
+    tree = parser.parse(source, tree);
+    assert.equal(tree.rootNode.toString(), createParser().parse(source).rootNode.toString(), source);
+    expression = replacement;
+  }
+});
+
 test("incremental key and modifier edits match a fresh parse", () => {
   const parser = createParser();
   let source = "data-on:click__window";

@@ -30,7 +30,9 @@ local ok, error = pcall(function()
 	vim.api.nvim_exec_autocmds('User', { pattern = 'TSUpdate' })
 	assert(require('nvim-treesitter.parsers').datastar.install_info.path == root)
 
-	local parser = vim.treesitter.get_string_parser('<button data-on:click="$count++"></button>', 'html')
+	local parser = vim.treesitter.get_string_parser([[<button
+		data-on:click="$controller = new AbortController(); @get('/endpoint', {requestCancellation: $controller})"
+		data-text="`count: ${$$count}`"></button>]], 'html')
 	parser:parse(true)
 	local child = assert(parser:children().datastar, 'Datastar injections were not loaded')
 	for _, tree in ipairs(child:trees()) do

@@ -1,0 +1,352 @@
+==================
+constructor in fetch options
+==================
+$controller = new AbortController(); @get('/endpoint', {requestCancellation: $controller})
+---
+
+(program
+  (expression_statement
+    (assignment_expression
+      (signal_reference
+        (signal_identifier))
+      (new_expression
+        (identifier)
+        (arguments))))
+  (expression_statement
+    (action_call
+      (action_name
+        (identifier))
+      (arguments
+        (string
+          (string_fragment))
+        (object
+          (pair
+            (property_identifier)
+            (signal_reference
+              (signal_identifier))))))))
+
+==================
+intl date constructor
+==================
+@intl('datetime', new Date(), {year: 'numeric'})
+---
+
+(program
+  (expression_statement
+    (action_call
+      (action_name
+        (identifier))
+      (arguments
+        (string
+          (string_fragment))
+        (new_expression
+          (identifier)
+          (arguments))
+        (object
+          (pair
+            (property_identifier)
+            (string
+              (string_fragment))))))))
+
+==================
+block arrow and declarations
+==================
+@peek(() => { const value = $foo; return value + 1 })
+---
+
+(program
+  (expression_statement
+    (action_call
+      (action_name
+        (identifier))
+      (arguments
+        (arrow_function
+          (formal_parameters)
+          (statement_block
+            (lexical_declaration
+              (variable_declarator
+                (identifier)
+                (signal_reference
+                  (signal_identifier))))
+            (return_statement
+              (binary_expression
+                (identifier)
+                (number)))))))))
+
+==================
+function iife
+==================
+(function () { return $foo + $bar })()
+---
+
+(program
+  (expression_statement
+    (call_expression
+      (parenthesized_expression
+        (function_expression
+          (formal_parameters)
+          (statement_block
+            (return_statement
+              (binary_expression
+                (signal_reference
+                  (signal_identifier))
+                (signal_reference
+                  (signal_identifier)))))))
+      (arguments))))
+
+==================
+template interpolation
+==================
+`/users/${$user.id}?page=${$page}`
+---
+
+(program
+  (expression_statement
+    (template_string
+      (string_fragment)
+      (template_substitution
+        (signal_reference
+          (signal_identifier)
+          (signal_identifier)))
+      (string_fragment)
+      (template_substitution
+        (signal_reference
+          (signal_identifier))))))
+
+==================
+nested template interpolation and actions
+==================
+`result: ${$ready ? @peek(() => $value) : `waiting ${$count}`}`
+---
+
+(program
+  (expression_statement
+    (template_string
+      (string_fragment)
+      (template_substitution
+        (ternary_expression
+          (signal_reference
+            (signal_identifier))
+          (action_call
+            (action_name
+              (identifier))
+            (arguments
+              (arrow_function
+                (formal_parameters)
+                (signal_reference
+                  (signal_identifier)))))
+          (template_string
+            (string_fragment)
+            (template_substitution
+              (signal_reference
+                (signal_identifier)))))))))
+
+==================
+regex character classes and modern flags
+==================
+@setAll(false, {include: /[/\\]/dv})
+---
+
+(program
+  (expression_statement
+    (action_call
+      (action_name
+        (identifier))
+      (arguments
+        (false)
+        (object
+          (pair
+            (property_identifier)
+            (regex
+              (regex_pattern)
+              (regex_flags))))))))
+
+==================
+prefix updates
+==================
+++$count; --$$remaining
+---
+
+(program
+  (expression_statement
+    (update_expression
+      (signal_reference
+        (signal_identifier))))
+  (expression_statement
+    (update_expression
+      (signal_reference
+        (signal_identifier)))))
+
+==================
+conditional assignment
+==================
+$ready && ($count += 1)
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      (signal_reference
+        (signal_identifier))
+      (parenthesized_expression
+        (augmented_assignment_expression
+          (signal_reference
+            (signal_identifier))
+          (number))))))
+
+==================
+assignment chains
+==================
+$foo = $bar = 1
+---
+
+(program
+  (expression_statement
+    (assignment_expression
+      (signal_reference
+        (signal_identifier))
+      (assignment_expression
+        (signal_reference
+          (signal_identifier))
+        (number)))))
+
+==================
+optional calls
+==================
+$controller?.abort?.()
+---
+
+(program
+  (expression_statement
+    (call_expression
+      (member_expression
+        (signal_reference
+          (signal_identifier))
+        (optional_chain)
+        (property_identifier))
+      (optional_chain)
+      (arguments))))
+
+==================
+numeric literals
+==================
+[0xff, 0b101, 0o77, 1_000, .5, 2n]
+---
+
+(program
+  (expression_statement
+    (array
+      (number)
+      (number)
+      (number)
+      (number)
+      (number)
+      (number))))
+
+==================
+object value and shorthand properties
+==================
+{foo: $foo, value, 1: 'one', [$key]: $value}
+---
+
+(program
+  (expression_statement
+    (object
+      (pair
+        (property_identifier)
+        (signal_reference
+          (signal_identifier)))
+      (shorthand_property_identifier)
+      (pair
+        (number)
+        (string
+          (string_fragment)))
+      (pair
+        (computed_property_name
+          (signal_reference
+            (signal_identifier)))
+        (signal_reference
+          (signal_identifier))))))
+
+==================
+comments with explicit separators
+==================
+/* begin */ $count++; // sent to backend
+@post('/count') /* end */
+---
+
+(program
+  (comment)
+  (expression_statement
+    (update_expression
+      (signal_reference
+        (signal_identifier))))
+  (comment)
+  (expression_statement
+    (action_call
+      (action_name
+        (identifier))
+      (arguments
+        (string
+          (string_fragment))))
+    (comment)))
+
+==================
+right associative exponentiation
+==================
+2 ** 3 ** 2
+---
+
+(program
+  (expression_statement
+    (binary_expression
+      (number)
+      (binary_expression
+        (number)
+        (number)))))
+
+==================
+destructured arrow parameters
+==================
+({count}, ...args) => count + args.length
+---
+
+(program
+  (expression_statement
+    (arrow_function
+      (formal_parameters
+        (object_pattern
+          (shorthand_property_identifier_pattern))
+        (rest_pattern
+          (identifier)))
+      (binary_expression
+        (identifier)
+        (member_expression
+          (identifier)
+          (property_identifier))))))
+
+==================
+reserved signal property
+==================
+$object.default
+---
+
+(program
+  (expression_statement
+    (signal_reference
+      (signal_identifier)
+      (signal_identifier))))
+
+==================
+unicode javascript identifier
+==================
+fühlt($foo)
+---
+
+(program
+  (expression_statement
+    (call_expression
+      (identifier)
+      (arguments
+        (signal_reference
+          (signal_identifier))))))

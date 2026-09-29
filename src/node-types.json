@@ -549,6 +549,57 @@
     }
   },
   {
+    "type": "loop_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "arrow_function",
+          "named": true
+        },
+        {
+          "type": "binary_expression",
+          "named": true
+        },
+        {
+          "type": "call_expression",
+          "named": true
+        },
+        {
+          "type": "computed_member_expression",
+          "named": true
+        },
+        {
+          "type": "conditional_expression",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "member_expression",
+          "named": true
+        },
+        {
+          "type": "parenthesized_expression",
+          "named": true
+        },
+        {
+          "type": "primary_expression",
+          "named": true
+        },
+        {
+          "type": "unary_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "member_expression",
     "named": true,
     "fields": {},
@@ -838,7 +889,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "arrow_function",
@@ -890,7 +941,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "assignment_statement",
@@ -902,6 +953,10 @@
         },
         {
           "type": "expression_statement",
+          "named": true
+        },
+        {
+          "type": "loop_expression",
           "named": true
         },
         {
@@ -1038,6 +1093,10 @@
   },
   {
     "type": "$",
+    "named": false
+  },
+  {
+    "type": "$$",
     "named": false
   },
   {
@@ -1281,6 +1340,10 @@
     "named": false
   },
   {
+    "type": "data-star-",
+    "named": false
+  },
+  {
     "type": "delete",
     "named": false
   },
@@ -1345,6 +1408,10 @@
     "named": false
   },
   {
+    "type": "nonce",
+    "named": false
+  },
+  {
     "type": "null_literal",
     "named": true
   },
@@ -1402,10 +1469,6 @@
   },
   {
     "type": "replace-url",
-    "named": false
-  },
-  {
-    "type": "rocket",
     "named": false
   },
   {

@@ -12,14 +12,22 @@ module.exports = grammar({
 
 	externals: ($) => [$.plugin_key],
 
-	conflicts: ($) => [[$.sequence_expression]],
+	conflicts: ($) => [
+		[$.sequence_expression],
+		[$.primary_expression, $.loop_expression],
+	],
 
 	rules: {
-		source_file: ($) => choice(repeat1($.datastar_attribute), repeat1($._statement)),
+		source_file: ($) =>
+			choice(
+				repeat1($.datastar_attribute),
+				seq(optional($._statement), optional(";")),
+				$.loop_expression,
+			),
 
 		datastar_attribute: ($) =>
 			seq(
-				"data-",
+				choice("data-", "data-star-"),
 				$.plugin_name,
 				optional(seq(":", $.plugin_key)),
 				repeat(seq("__", $.modifier)),
@@ -38,6 +46,7 @@ module.exports = grammar({
 				"indicator",
 				"init",
 				"json-signals",
+				"nonce",
 				"on",
 				"on-intersect",
 				"on-interval",
@@ -58,7 +67,6 @@ module.exports = grammar({
 				"persist",
 				"query-string",
 				"replace-url",
-				"rocket",
 				"scroll-into-view",
 				"view-transition",
 				// Rocket structural template plugins
@@ -133,12 +141,16 @@ module.exports = grammar({
 			),
 
 		// Datastar-specific
-		signal_reference: ($) => seq("$", $._property_chain),
+		signal_reference: ($) =>
+			prec.right(18, seq(choice("$", "$$"), optional($._property_chain))),
+		loop_expression: ($) =>
+			prec.dynamic(1, seq($.identifier, ",", $.identifier, "in", $._expression)),
 		action_call: ($) => seq($.action_name, "(", optional($.arguments), ")"),
 		action_name: ($) => seq("@", $.identifier),
 
 		_property_chain: ($) =>
-			prec.left(
+			prec.right(
+				18,
 				seq(
 					$.signal_identifier,
 					repeat(
@@ -297,13 +309,14 @@ module.exports = grammar({
 			seq(
 				choice($._expression, $.spread_element),
 				repeat(seq(",", choice($._expression, $.spread_element))),
+				optional(","),
 			),
 
 		// Standard JavaScript identifier (used for variables, properties, etc.)
-		identifier: ($) => /[a-zA-Z_][a-zA-Z0-9_]*/,
+		identifier: ($) => /[a-zA-Z_][a-zA-Z0-9_$]*/,
 
 		// Datastar-specific identifier that allows hyphens (for signal names like $foo-bar)
 		// This is used only in signal_reference contexts
-		signal_identifier: ($) => /[a-zA-Z_][a-zA-Z0-9_-]*/,
+		signal_identifier: ($) => token(prec(1, /[a-zA-Z0-9_]+(-[a-zA-Z0-9_]+)*/)),
 	},
 });

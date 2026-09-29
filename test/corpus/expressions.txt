@@ -1,0 +1,323 @@
+==================
+rocket local signals
+==================
+$$count += 1
+---
+
+(source_file
+  (assignment_statement
+    (signal_reference
+      (signal_identifier))
+    (primary_expression
+      (literal
+        (number_literal)))))
+
+==================
+rocket local nested signals
+==================
+$$user.name
+---
+
+(source_file
+  (expression_statement
+    (primary_expression
+      (signal_reference
+        (signal_identifier)
+        (signal_identifier)))))
+
+==================
+numeric signal paths
+==================
+$123 + $foo.0.name
+---
+
+(source_file
+  (expression_statement
+    (binary_expression
+      (primary_expression
+        (signal_reference
+          (signal_identifier)))
+      (member_expression
+        (primary_expression
+          (signal_reference
+            (signal_identifier)
+            (signal_identifier)))
+        (identifier)))))
+
+==================
+bracket root signal
+==================
+$['foo-bar'] = 1
+---
+
+(source_file
+  (assignment_statement
+    (computed_member_expression
+      (primary_expression
+        (signal_reference))
+      (primary_expression
+        (literal
+          (string_literal))))
+    (primary_expression
+      (literal
+        (number_literal)))))
+
+==================
+signal root member
+==================
+$._rocket.demo.count
+---
+
+(source_file
+  (expression_statement
+    (member_expression
+      (member_expression
+        (member_expression
+          (primary_expression
+            (signal_reference))
+          (identifier))
+        (identifier))
+      (identifier))))
+
+==================
+postfix decrement
+==================
+$count--
+---
+
+(source_file
+  (expression_statement
+    (unary_expression
+      (primary_expression
+        (signal_reference
+          (signal_identifier))))))
+
+==================
+hyphenated signals
+==================
+$foo-bar + $foo.bar-baz
+---
+
+(source_file
+  (expression_statement
+    (binary_expression
+      (primary_expression
+        (signal_reference
+          (signal_identifier)))
+      (primary_expression
+        (signal_reference
+          (signal_identifier)
+          (signal_identifier))))))
+
+==================
+optional access and computed paths
+==================
+$data?.user?.email ?? $arr[$index]
+---
+
+(source_file
+  (expression_statement
+    (binary_expression
+      (member_expression
+        (primary_expression
+          (signal_reference
+            (signal_identifier)
+            (signal_identifier)))
+        (identifier))
+      (primary_expression
+        (signal_reference
+          (signal_identifier)
+          (primary_expression
+            (signal_reference
+              (signal_identifier))))))))
+
+==================
+query action and trailing arguments comma
+==================
+@query('/endpoint', {payload: {foo: $foo}},)
+---
+
+(source_file
+  (expression_statement
+    (primary_expression
+      (action_call
+        (action_name
+          (identifier))
+        (arguments
+          (primary_expression
+            (literal
+              (string_literal)))
+          (primary_expression
+            (object
+              (property
+                (identifier)
+                (primary_expression
+                  (object
+                    (property
+                      (identifier)
+                      (primary_expression
+                        (signal_reference
+                          (signal_identifier))))))))))))))
+
+==================
+peek arrow function
+==================
+$foo + @peek(() => $bar)
+---
+
+(source_file
+  (expression_statement
+    (binary_expression
+      (primary_expression
+        (signal_reference
+          (signal_identifier)))
+      (primary_expression
+        (action_call
+          (action_name
+            (identifier))
+          (arguments
+            (arrow_function
+              (primary_expression
+                (signal_reference
+                  (signal_identifier))))))))))
+
+==================
+regex filter action
+==================
+@setAll(true, {include: /^user\./, exclude: /_temp$/})
+---
+
+(source_file
+  (expression_statement
+    (primary_expression
+      (action_call
+        (action_name
+          (identifier))
+        (arguments
+          (primary_expression
+            (literal
+              (boolean_literal)))
+          (primary_expression
+            (object
+              (property
+                (identifier)
+                (primary_expression
+                  (literal
+                    (regex_literal))))
+              (property
+                (identifier)
+                (primary_expression
+                  (literal
+                    (regex_literal)))))))))))
+
+==================
+rocket bare iterable
+==================
+$$letters.filter(Boolean)
+---
+
+(source_file
+  (expression_statement
+    (call_expression
+      (primary_expression
+        (signal_reference
+          (signal_identifier)
+          (signal_identifier)))
+      (arguments
+        (primary_expression
+          (identifier))))))
+
+==================
+rocket item alias
+==================
+letter in $$letters
+---
+
+(source_file
+  (expression_statement
+    (binary_expression
+      (primary_expression
+        (identifier))
+      (primary_expression
+        (signal_reference
+          (signal_identifier))))))
+
+==================
+rocket item and index aliases
+==================
+letter, row in $$letters.filter(Boolean)
+---
+
+(source_file
+  (loop_expression
+    (identifier)
+    (identifier)
+    (call_expression
+      (primary_expression
+        (signal_reference
+          (signal_identifier)
+          (signal_identifier)))
+      (arguments
+        (primary_expression
+          (identifier))))))
+
+==================
+ordinary comma sequence
+==================
+a, b
+---
+
+(source_file
+  (sequence_expression
+    (expression_statement
+      (primary_expression
+        (identifier)))
+    (expression_statement
+      (primary_expression
+        (identifier)))))
+
+==================
+semicolon statements and trailing semicolon
+==================
+$loading = true; @post('/launch');
+---
+
+(source_file
+  (sequence_expression
+    (assignment_statement
+      (signal_reference
+        (signal_identifier))
+      (primary_expression
+        (literal
+          (boolean_literal))))
+    (expression_statement
+      (primary_expression
+        (action_call
+          (action_name
+            (identifier))
+          (arguments
+            (primary_expression
+              (literal
+                (string_literal)))))))))
+
+==================
+dollar in JavaScript identifier and custom action
+==================
+helper$($foo); @custom$Action()
+---
+
+(source_file
+  (sequence_expression
+    (expression_statement
+      (call_expression
+        (primary_expression
+          (identifier))
+        (arguments
+          (primary_expression
+            (signal_reference
+              (signal_identifier))))))
+    (expression_statement
+      (primary_expression
+        (action_call
+          (action_name
+            (identifier)))))))

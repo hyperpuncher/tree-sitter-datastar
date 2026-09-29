@@ -1,0 +1,54 @@
+==================
+aliased attribute
+==================
+data-star-on:click__prevent
+---
+(source_file
+  (datastar_attribute
+    (plugin_name)
+    (plugin_key)
+    (modifier (modifier_name))))
+
+==================
+csp nonce attribute
+==================
+data-nonce
+data-star-nonce
+---
+(source_file
+  (datastar_attribute (plugin_name))
+  (datastar_attribute (plugin_name)))
+
+==================
+custom element binding
+==================
+data-bind:is-checked__prop.checked__event.input.change
+---
+(source_file
+  (datastar_attribute
+    (plugin_name)
+    (plugin_key)
+    (modifier (modifier_name) (modifier_tag))
+    (modifier (modifier_name) (modifier_tag) (modifier_tag))))
+
+==================
+rocket root modifier
+==================
+data-bind:_name__root
+---
+(source_file
+  (datastar_attribute
+    (plugin_name)
+    (plugin_key)
+    (modifier (modifier_name))))
+
+==================
+single underscores in keys
+==================
+data-signals:_foo_bar.__ifmissing
+---
+(source_file
+  (datastar_attribute
+    (plugin_name)
+    (plugin_key)
+    (modifier (modifier_name))))

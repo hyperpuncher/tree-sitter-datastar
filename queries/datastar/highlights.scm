@@ -3,7 +3,7 @@
 ; Datastar attribute names - parsed from HTML attribute names
 ; data-{plugin}[:key][__modifier[.tag]...]
 (datastar_attribute
-  "data-" @tag.attribute
+  ["data-" "data-star-"] @tag.attribute
   (plugin_name) @tag.builtin)
 
 (datastar_attribute
@@ -39,7 +39,7 @@
 ; Literals
 (string_literal) @string
 (regex_literal) @string.regex
-(number_literal) @number  
+(number_literal) @number
 (boolean_literal) @constant.builtin
 (null_literal) @constant.builtin
 (undefined_literal) @constant.builtin

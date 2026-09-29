@@ -50,4 +50,39 @@ mod tests {
             .set_language(&super::LANGUAGE.into())
             .expect("Error loading Datastar parser");
     }
+
+    #[test]
+    fn expressions_require_statement_separators() {
+        let mut parser = tree_sitter::Parser::new();
+        parser.set_language(&super::LANGUAGE.into()).unwrap();
+        for source in ["", "  \n", "$count++; @post('/save');"] {
+            assert!(
+                !parser.parse(source, None).unwrap().root_node().has_error(),
+                "{source}"
+            );
+        }
+        for source in [
+            "$count++ @post('/save')",
+            "$foo = ;",
+            "letter,, row in $$letters",
+        ] {
+            assert!(
+                parser.parse(source, None).unwrap().root_node().has_error(),
+                "{source}"
+            );
+        }
+    }
+
+    #[test]
+    fn datastar_queries_compile() {
+        let language = super::LANGUAGE.into();
+        for source in [
+            include_str!("../../queries/datastar/highlights.scm"),
+            include_str!("../../queries/datastar/indents.scm"),
+            include_str!("../../queries/datastar/textobjects.scm"),
+            include_str!("../../queries/highlights-helix.scm"),
+        ] {
+            tree_sitter::Query::new(&language, source).unwrap();
+        }
+    }
 }

@@ -74,6 +74,7 @@
     "start": "tree-sitter playground",
     "test": "tree-sitter test && node --test bindings/node/*_test.js test/generation.test.js",
     "generate": "tree-sitter generate && node scripts/generate-queries.js",
+    "bench": "node scripts/benchmark.js",
     "test:injections": "nvim --headless -u NONE -l test/injections.lua",
     "test:neovim": "nvim --headless -u NONE -l test/neovim.lua",
     "test:distribution": "node --test test/distribution.test.js test/install-helix.test.js",

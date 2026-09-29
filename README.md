@@ -66,13 +66,16 @@ source = { path = "/path/to/tree-sitter-datastar" }
 git clone https://github.com/hyperpuncher/tree-sitter-datastar
 cd tree-sitter-datastar
 bunx tree-sitter generate        # regenerate parser from grammar.js
-bun scripts/generate-queries.js  # regenerate host injections from the grammar
+bun scripts/generate-queries.js  # regenerate host injections and Helix highlights
+node-gyp rebuild                # rebuild the native addon after grammar changes
 bunx tree-sitter test            # parser corpus
 cargo test                      # Rust binding, queries, and separator checks
 bun run test                    # Node binding
 bun run test:injections         # requires installed host parsers
 NVIM_TREESITTER=/path/to/nvim-treesitter bun run test:neovim  # real installation check
 ```
+
+`bun run bench` measures full and incremental parsing with the rebuilt Node addon. Set `BENCH_ITERATIONS` to adjust the run length; timings are local baselines, not cross-machine performance guarantees.
 
 Host injection queries distinguish expressions from plain signal names, attribute lists, and raw media queries. Dynamic JSX template substitutions are left to the host parser rather than injecting incomplete expression fragments. `bun run test:distribution` checks Make/CMake installation, package contents, and the Helix installer.
 

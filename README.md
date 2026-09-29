@@ -15,10 +15,12 @@ Uses [lazy.nvim](https://github.com/folke/lazy.nvim) + [nvim-treesitter](https:/
 ### Helix
 
 ```bash
-./install-helix.sh
+./install-helix.sh --html
 ```
 
-Then add to `~/.config/helix/languages.toml`:
+The script honors `XDG_CONFIG_HOME`, `CC`, and `CFLAGS`, and refuses to overwrite custom HTML queries. If you already have host queries, merge `docs/helix-html-injections.scm` manually and run without `--html`.
+
+Then add to `~/.config/helix/languages.toml` (or the corresponding XDG config path):
 
 ```toml
 [[language]]
@@ -71,7 +73,7 @@ bun run test                    # Node binding
 nvim --headless -u NONE -l test/injections.lua  # requires host parsers
 ```
 
-Host injection queries distinguish expressions from plain signal names and attribute lists. Helix users must also install `docs/helix-html-injections.scm` as their HTML host query; `install-helix.sh` installs only the Datastar parser and its own queries.
+Host injection queries distinguish expressions from plain signal names, attribute lists, and raw media queries. Dynamic JSX template substitutions are left to the host parser rather than injecting incomplete expression fragments. `bun run test:distribution` checks Make/CMake installation, package contents, and the Helix installer.
 
 ## Limitations
 

@@ -75,7 +75,7 @@
     "test": "tree-sitter test && node --test bindings/node/*_test.js test/generation.test.js",
     "generate": "tree-sitter generate && node scripts/generate-queries.js",
     "test:injections": "nvim --headless -u NONE -l test/injections.lua",
-    "test:distribution": "node --test test/distribution.test.js",
+    "test:distribution": "node --test test/distribution.test.js test/install-helix.test.js",
     "prebuildify": "prebuildify --napi --strip"
   },
   "tree-sitter": [

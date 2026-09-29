@@ -6,7 +6,7 @@ Tree-sitter grammar for [Datastar](https://data-star.dev) v1.0.4 expressions and
 
 ### Neovim
 
-Uses [lazy.nvim](https://github.com/folke/lazy.nvim) + [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter):
+Uses [lazy.nvim](https://github.com/folke/lazy.nvim) + the current `main` branch of [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter), with Neovim 0.12+ and its required system tree-sitter CLI. The legacy `master` branch is not supported:
 
 ```lua
 { 'hyperpuncher/tree-sitter-datastar', dependencies = { 'nvim-treesitter/nvim-treesitter' } },
@@ -70,7 +70,8 @@ bun scripts/generate-queries.js  # regenerate host injections from the grammar
 bunx tree-sitter test            # parser corpus
 cargo test                      # Rust binding, queries, and separator checks
 bun run test                    # Node binding
-nvim --headless -u NONE -l test/injections.lua  # requires host parsers
+bun run test:injections         # requires installed host parsers
+NVIM_TREESITTER=/path/to/nvim-treesitter bun run test:neovim  # real installation check
 ```
 
 Host injection queries distinguish expressions from plain signal names, attribute lists, and raw media queries. Dynamic JSX template substitutions are left to the host parser rather than injecting incomplete expression fragments. `bun run test:distribution` checks Make/CMake installation, package contents, and the Helix installer.

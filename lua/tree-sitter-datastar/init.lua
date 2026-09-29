@@ -7,33 +7,26 @@ local function register()
 	require('nvim-treesitter.parsers').datastar = {
 		install_info = {
 			path = plugin_dir,
-			files = { 'src/parser.c' },
-			generate_requires_npm = false,
-			requires_generate_from_grammar = false,
+			queries = 'queries/datastar',
 		},
 	}
 end
 
 function M.setup()
-	local ok, _ = pcall(require, 'nvim-treesitter.parsers')
+	local ok, treesitter = pcall(require, 'nvim-treesitter')
 	if not ok then
 		return
 	end
 
 	register()
-
 	vim.api.nvim_create_autocmd('User', {
+		group = vim.api.nvim_create_augroup('TreeSitterDatastar', { clear = true }),
 		pattern = 'TSUpdate',
 		callback = register,
 	})
 
-	local installed = vim.fs.joinpath(
-		vim.fn.stdpath('data'), 'site', 'parser', 'datastar.so')
-	if not vim.uv.fs_stat(installed) then
-		vim.schedule(function()
-			require('nvim-treesitter.install').install({ 'datastar' })
-		end)
-	end
+	-- nvim-treesitter handles its configured install directory and skips installed parsers.
+	treesitter.install({ 'datastar' })
 end
 
 return M

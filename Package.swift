@@ -1,12 +1,6 @@
 // swift-tools-version:5.3
 
-import Foundation
 import PackageDescription
-
-var sources = ["src/parser.c"]
-if FileManager.default.fileExists(atPath: "src/scanner.c") {
-    sources.append("src/scanner.c")
-}
 
 let package = Package(
     name: "TreeSitterDatastar",
@@ -21,7 +15,7 @@ let package = Package(
             name: "TreeSitterDatastar",
             dependencies: [],
             path: ".",
-            sources: sources,
+            sources: ["src/parser.c"],
             resources: [
                 .copy("queries")
             ],

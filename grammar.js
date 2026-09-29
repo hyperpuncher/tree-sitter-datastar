@@ -10,8 +10,6 @@
 module.exports = grammar({
 	name: "datastar",
 
-	externals: ($) => [$.plugin_key],
-
 	conflicts: ($) => [
 		[$.sequence_expression],
 		[$.primary_expression, $.loop_expression],
@@ -74,6 +72,17 @@ module.exports = grammar({
 				"else-if",
 				"else",
 				"for",
+			),
+
+		// Keep underscores separate so the longer __ delimiter wins lexically.
+		plugin_key: ($) =>
+			choice(
+				token.immediate("_"),
+				seq(
+					token.immediate(/_?[a-zA-Z0-9.-]+/),
+					repeat(seq(token.immediate("_"), token.immediate(/[a-zA-Z0-9.-]+/))),
+					optional(token.immediate("_")),
+				),
 			),
 
 		modifier: ($) => seq($.modifier_name, repeat(seq(".", $.modifier_tag))),

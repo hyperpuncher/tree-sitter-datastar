@@ -7,7 +7,7 @@ local function register()
 	require('nvim-treesitter.parsers').datastar = {
 		install_info = {
 			path = plugin_dir,
-			files = { 'src/parser.c', 'src/scanner.c' },
+			files = { 'src/parser.c' },
 			generate_requires_npm = false,
 			requires_generate_from_grammar = false,
 		},

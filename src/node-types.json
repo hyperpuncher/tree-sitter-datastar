@@ -761,6 +761,11 @@
     }
   },
   {
+    "type": "plugin_key",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "plugin_name",
     "named": true,
     "fields": {}
@@ -1304,6 +1309,10 @@
     "named": false
   },
   {
+    "type": "_",
+    "named": false
+  },
+  {
     "type": "__",
     "named": false
   },
@@ -1450,10 +1459,6 @@
   {
     "type": "persist",
     "named": false
-  },
-  {
-    "type": "plugin_key",
-    "named": true
   },
   {
     "type": "preserve-attr",

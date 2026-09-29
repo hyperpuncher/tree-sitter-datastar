@@ -74,6 +74,36 @@ mod tests {
     }
 
     #[test]
+    fn attribute_keys_stop_at_modifier_delimiters() {
+        let mut parser = tree_sitter::Parser::new();
+        parser.set_language(&super::LANGUAGE.into()).unwrap();
+        for (source, key) in [
+            ("data-bind:_", "_"),
+            ("data-signals:_foo_bar.baz__ifmissing", "_foo_bar.baz"),
+            ("data-signals:foo_", "foo_"),
+            ("data-on:click__window__debounce.500ms", "click"),
+        ] {
+            let tree = parser.parse(source, None).unwrap();
+            assert!(!tree.root_node().has_error(), "{source}");
+            let attribute = tree.root_node().named_child(0).unwrap();
+            let parsed_key = attribute.named_child(1).unwrap();
+            assert_eq!(parsed_key.kind(), "plugin_key");
+            assert_eq!(parsed_key.utf8_text(source.as_bytes()).unwrap(), key);
+        }
+        for source in [
+            "data-on:__window",
+            "data-signals:foo___ifmissing",
+            "data-on: click",
+            "data-on:",
+        ] {
+            assert!(
+                parser.parse(source, None).unwrap().root_node().has_error(),
+                "{source}"
+            );
+        }
+    }
+
+    #[test]
     fn datastar_queries_compile() {
         let language = super::LANGUAGE.into();
         for source in [

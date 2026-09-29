@@ -25,7 +25,7 @@ mkdir -p "$PARSER_DIR" "$QUERIES_DIR"
 
 echo "Compiling parser..."
 $CC -shared -fPIC -o "$PARSER_DIR/datastar.so" \
-	"$SCRIPT_DIR/src/parser.c" "$SCRIPT_DIR/src/scanner.c" -I"$SCRIPT_DIR/src"
+	"$SCRIPT_DIR/src/parser.c" -I"$SCRIPT_DIR/src"
 
 echo "Installing queries..."
 cp "$SCRIPT_DIR/queries/highlights-helix.scm" "$QUERIES_DIR/highlights.scm"

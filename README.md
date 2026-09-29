@@ -85,7 +85,6 @@ tree-sitter-datastar/
 ├── tree-sitter.json
 ├── src/
 │   ├── parser.c
-│   ├── scanner.c
 │   └── grammar.json
 ├── queries/
 │   ├── datastar/                 # Neovim queries (rtp-discovered)

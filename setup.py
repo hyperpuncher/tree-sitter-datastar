@@ -11,8 +11,6 @@ sources = [
     "bindings/python/tree_sitter_datastar/binding.c",
     "src/parser.c",
 ]
-if path.exists("src/scanner.c"):
-    sources.append("src/scanner.c")
 
 macros: list[tuple[str, str | None]] = [
     ("PY_SSIZE_T_CLEAN", None),

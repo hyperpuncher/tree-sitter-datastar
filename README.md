@@ -119,8 +119,7 @@ tree-sitter-datastar/
 │   │   ├── highlights.scm
 │   │   ├── indents.scm
 │   │   └── textobjects.scm
-│   ├── highlights-helix.scm      # Helix-specific capture names
-│   └── injections-helix.scm
+│   └── highlights-helix.scm      # Helix-specific capture names
 ├── after/queries/                # Neovim injection queries
 │   ├── html/injections.scm
 │   ├── templ/injections.scm

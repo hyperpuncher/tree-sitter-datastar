@@ -38,7 +38,21 @@ local ok, error = pcall(function()
 	for _, tree in ipairs(child:trees()) do
 		assert(not tree:root():has_error(), 'injected syntax did not parse')
 	end
-	assert(vim.treesitter.query.get('datastar', 'highlights'), 'highlight query was not loaded')
+	local highlights = assert(vim.treesitter.query.get('datastar', 'highlights'), 'highlight query was not loaded')
+	-- Compiling a query does not evaluate its predicates. Exercise builtin matches.
+	local expression = "console.log(window, document, module, arguments); require('example');"
+	local expression_parser = vim.treesitter.get_string_parser(expression, 'datastar')
+	local expression_tree = expression_parser:parse()[1]
+	local builtins = {}
+	for capture, node in highlights:iter_captures(expression_tree:root(), expression) do
+		local name = highlights.captures[capture]
+		if name == 'variable.builtin' or name == 'function.builtin' then
+			builtins[vim.treesitter.get_node_text(node, expression)] = true
+		end
+	end
+	for _, name in ipairs({ 'console', 'window', 'document', 'module', 'arguments', 'require' }) do
+		assert(builtins[name], 'missing builtin highlight: ' .. name)
+	end
 end)
 vim.fn.delete(directory, 'rf')
 assert(ok, error)
